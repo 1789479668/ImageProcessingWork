@@ -3,27 +3,68 @@ import numpy as np
 
 #np.pi=3.141592653589793
 '''
-二维傅里叶变换分解为两个维度上分别做一次一维傅里叶变换
-p180
+二维傅里叶变换分解为两个维度上分别做一次一维傅里叶变换，p180
+(x,y)，原图像坐标
+(u,v)，变换后坐标（频谱）
 '''
+#调整至main中
+def dft2d(imgarray, type):
+    if type == 'DFT':
+        return dft_2d(imgarray)
+    elif type == 'IDFT':
+        return idft_2d(imgarray)
+def fourier_transform(imgarray, flags):
+    """Get the Fourier spectrum of the given image"""
+    '''获得所给图片的傅里叶频谱'''
+    imgarray = dft2d(imgarray, flags)
+    imgarray = np.fft.fftshift(imgarray)
+    imgarray = np.log(1 + np.abs(imgarray))
+    imgarray = quantize(imgarray)
+    return imgarray
 
-def DFT(img, path):
-    imgarray = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
-    cv2.imshow('image', imgarray)
-    #imgarray是一个(H,W)矩阵
-    H, W = imgarray.shape
-    # print(imgarray)
-    # G = Fx*imgarray*Fy（矩阵运算）
-        # for i in range(H):
-        #     for k in range(W):
-        #         Fx = 1/np.sqrt(H)*np.exp(-1j*2*np.pi*i*k/(np.sqrt(H)*np.sqrt(W)))
-        #         Fy = 1/np.sqrt(W)*np.exp(-1j*2*np.pi*i*k/(np.sqrt(H)*np.sqrt(W)))
-        # #傅里叶变换的核
-        #         Garray = np.dot(np.dot(Fx,imgarray),Fy)
-    F = 1/np.sqrt(H)*np.exp(-1j*2*np.pi*i*k/H)
-    cv2.imshow('FFT', Garray)
-    cv2.waitKey(0)
+def dft_1d(imgarray):
+    '''计算一维傅里叶变换'''
+    N = imgarray.shape[0]
+    #创建一个N元素的一维矩阵，并且重塑为2d矩阵形式，即1xN矩阵，[[0,1,2,...,N-1]]
+    x = np.arange(N).reshape((1, N))
+    #转置x（作频谱坐标）
+    u = x.reshape((N, 1))
+    # 傅里叶变换核 e ^ (-j * 2 * π * u * x / N)
+    E = np.exp(-1j * 2 * np.pi * np.dot(u, x) / N)
+    return np.dot(E, imgarray)
 
-img_path = './src/salt_pepper_Miss.bmp'
-save_path = './src_save/m_Miss.bmp'
-DFT(img_path, save_path)
+def idft_1d(imgarray):
+    N = imgarray.shape[0]
+    #创建一个N元素的一维矩阵，并且重塑为2d矩阵形式，即1xN矩阵，[[0,1,2,...,N-1]]
+    x = np.arange(N).reshape((1, N))
+    #转置x（作频谱坐标）
+    u = x.reshape((N, 1))
+    # 傅里叶逆变换核 e ^ (j * 2 * π * u * x / N)
+    E = np.exp(1j * 2 * np.pi * np.dot(u, x) / N)
+    return np.dot(E, imgarray)
+
+def dft_2d(imgarray):
+    height,width = imgarray.shape
+    #创建频谱代表的矩阵
+    garray = np.zeros((height, width), dtype=complex)
+    #拆分为x，y两个方向的运算，详情见wps的180
+    for row in range(height):
+        #对每行进行傅里叶变换，imgarray[row]即imgarray[row, :],是一个一维的矩阵，不是1xN的二维矩阵
+        garray[row, :] = dft_1d(imgarray[row])
+    for col in range(width):
+        garray[:, col] = dft_1d(garray[:, col])
+    return garray
+
+def idft_2d(imgarray):
+    height,width = imgarray.shape
+    #创建频谱代表的矩阵
+    garray = np.zeros((height, width), dtype=complex)
+    #拆分为x，y两个方向的运算，详情见wps的180
+    for row in range(height):
+        #对每行进行傅里叶变换，imgarray[row]即imgarray[row, :],是一个一维的矩阵，不是1xN的二维矩阵
+        garray[row, :] = idft_1d(imgarray[row])
+    for col in range(width):
+        garray[:, col] = idft_1d(garray[:, col])
+    return garray
+
+

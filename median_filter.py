@@ -1,9 +1,7 @@
 import cv2
 import numpy as np
 
-def MedianFilter(img, path, k=3, padding = None):
-
-    imgarray = cv2.imread(img, cv2.IMREAD_GRAYSCALE)#使用灰度读出，默认读出方式含有B,G,R三个通道，因为本就是灰度图，无需多此一举。
+def MedianFilter(imgarray, k=3, padding = None):
     H, W = imgarray.shape
     #灰度图像数据结构即(H,W)，BGR结构为(H,W,C)
 
@@ -25,9 +23,4 @@ def MedianFilter(img, path, k=3, padding = None):
                     new_array[i,j] = np.median(imgarray[i-edge:i+edge+1, j-edge:j+edge+1])
                     #使用median直接进行选取领域所有像素值的中间值代替当前点的像素值。
                     #使用new_array来储存运算后结果，而不是直接覆盖imgarray，防止连续作用发生
-        cv2.imwrite(path, new_array)
-
-img_path = './src/salt_pepper_Miss.bmp'
-save_path = './src_save/m_Miss.bmp'
-
-MedianFilter(img_path, save_path)
+        return new_array
