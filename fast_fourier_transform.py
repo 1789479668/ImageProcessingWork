@@ -8,20 +8,28 @@ import numpy as np
 (u,v)，变换后坐标（频谱）
 '''
 #调整至main中
+
+def fourier_transform(imgarray, type):
+    '''获得所给图片的傅里叶频谱'''
+    imgarray = dft2d(imgarray, type)
+    imgarray = np.fft.fftshift(imgarray)
+    imgarray = np.log(1 + np.abs(imgarray))
+    imgarray = quantize(imgarray)
+    return imgarray
 def dft2d(imgarray, type):
     if type == 'DFT':
         return dft_2d(imgarray)
     elif type == 'IDFT':
         return idft_2d(imgarray)
-def fourier_transform(imgarray, flags):
-    """Get the Fourier spectrum of the given image"""
-    '''获得所给图片的傅里叶频谱'''
-    imgarray = dft2d(imgarray, flags)
-    imgarray = np.fft.fftshift(imgarray)
-    imgarray = np.log(1 + np.abs(imgarray))
-    imgarray = quantize(imgarray)
-    return imgarray
-
+def quantize(matrix):
+    """Quantize the matrix"""
+    '''数值化'''
+    M, N = matrix.shape
+    factor = (matrix.max() - matrix.min()) / 256
+    for row in range(M):
+        for col in range(N):
+            matrix[row, col] = round(matrix[row, col] / factor)
+    return matrix
 def dft_1d(imgarray):
     '''计算一维傅里叶变换'''
     N = imgarray.shape[0]

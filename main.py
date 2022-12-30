@@ -11,7 +11,8 @@ def ImageProcessing(img, type):
     imgarray = cv2.imread(img, cv2.IMREAD_GRAYSCALE)#使用灰度读出，默认读出方式含有B,G,R三个通道，因为本就是灰度图，无需多此一举。
     if type == 'MedianFilter':
         return median_filter.MedianFilter(imgarray)
-
+    if type == 'DFT':
+        return fast_fourier_transform.fourier_transform(imgarray,type)
 '''
 中值滤波：MedianFilter
 离散傅里叶变换：DFT
