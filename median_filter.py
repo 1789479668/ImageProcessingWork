@@ -7,7 +7,7 @@ def MedianFilter(imgarray, k=3, padding = None):
 
     if not padding:
         edge = int((k-1)/2)
-        #设定领域大小
+        #设定邻域大小
         if H - 1 - edge <= edge or W - 1 - edge <= edge:
             print("参数k设置得太大了")
             return None

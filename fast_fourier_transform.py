@@ -17,19 +17,20 @@ def fourier_transform(imgarray, type):
     imgarray = quantize(imgarray)
     return imgarray
 def dft2d(imgarray, type):
+    '用以选择类型,调用正变换或者逆变换'
     if type == 'DFT':
         return dft_2d(imgarray)
     elif type == 'IDFT':
         return idft_2d(imgarray)
-def quantize(matrix):
-    """Quantize the matrix"""
-    '''数值化'''
-    M, N = matrix.shape
-    factor = (matrix.max() - matrix.min()) / 256
-    for row in range(M):
-        for col in range(N):
-            matrix[row, col] = round(matrix[row, col] / factor)
-    return matrix
+def quantize(array):
+    '''归一化，调整频谱图的对比度'''
+    H, W = array.shape
+    factor = (array.max() - array.min()) / 256
+    #设置权重因子
+    for row in range(H):
+        for col in range(W):
+            array[row, col] = round(array[row, col] / factor)
+    return array
 def dft_1d(imgarray):
     '''计算一维傅里叶变换'''
     N = imgarray.shape[0]
