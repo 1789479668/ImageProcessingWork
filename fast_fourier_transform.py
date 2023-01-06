@@ -7,11 +7,11 @@ import numpy as np
 (x,y)，原图像坐标
 (u,v)，变换后坐标（频谱）
 '''
-#调整至main中
 
 def fourier_transform(imgarray, type):
     '''获得所给图片的傅里叶频谱'''
     imgarray = dft2d(imgarray, type)
+    #得到傅里叶谱，但此时低频成分在四角而非中间，用fftshift进行移动
     imgarray = np.fft.fftshift(imgarray)
     imgarray = np.log(1 + np.abs(imgarray))
     imgarray = quantize(imgarray)
@@ -30,6 +30,7 @@ def quantize(array):
     for row in range(H):
         for col in range(W):
             array[row, col] = round(array[row, col] / factor)
+
     return array
 def dft_1d(imgarray):
     '''计算一维傅里叶变换'''
@@ -39,7 +40,9 @@ def dft_1d(imgarray):
     #转置x（作频谱坐标）
     u = x.reshape((N, 1))
     # 傅里叶变换核 e ^ (-j * 2 * π * u * x / N)
+    test_UX = np.dot(u, x)
     E = np.exp(-1j * 2 * np.pi * np.dot(u, x) / N)
+    test_v = np.dot(E, imgarray)
     return np.dot(E, imgarray)
 
 def idft_1d(imgarray):
@@ -50,11 +53,11 @@ def idft_1d(imgarray):
     u = x.reshape((N, 1))
     # 傅里叶逆变换核 e ^ (j * 2 * π * u * x / N)
     E = np.exp(1j * 2 * np.pi * np.dot(u, x) / N)
-    return np.dot(E, imgarray)
+    return np.dot(E, imgarray) / N
 
 def dft_2d(imgarray):
     height,width = imgarray.shape
-    #创建频谱代表的矩阵
+    #创建频谱代表的矩阵,同时该矩阵为复矩阵元素为[0.+0.j]，type为complex128
     garray = np.zeros((height, width), dtype=complex)
     #拆分为x，y两个方向的运算，详情见wps的180
     for row in range(height):
@@ -75,5 +78,4 @@ def idft_2d(imgarray):
     for col in range(width):
         garray[:, col] = idft_1d(garray[:, col])
     return garray
-
 

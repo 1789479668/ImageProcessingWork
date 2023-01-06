@@ -17,8 +17,10 @@ def ImageProcessing(img, type):
 离散傅里叶变换：DFT
 离散逆傅里叶变换：IDFT
 '''
-img_path = './src/salt_pepper_Miss.bmp'
-save_path = './src_save/m_Miss.bmp'
+img_path = './src/Miss.bmp'
+save_path = './src_save/g_Miss.BMP'
 
-new_array = ImageProcessing(img_path,'MedianFilter')
+new_array = ImageProcessing(img_path,'DFT')
 cv2.imwrite(save_path, new_array)
+# cv2.imshow('img',new_array)
+# cv2.waitKey()
