@@ -30,7 +30,6 @@ def quantize(array):
     for row in range(H):
         for col in range(W):
             array[row, col] = round(array[row, col] / factor)
-
     return array
 def dft_1d(imgarray):
     '''计算一维傅里叶变换'''
