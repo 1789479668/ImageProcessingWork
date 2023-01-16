@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 def equalize_hist(imgarray):
 
@@ -48,3 +49,10 @@ imgarray = cv2.imread(img, cv2.IMREAD_GRAYSCALE)#打开图片,并把图片转换
 output_img = equalize_hist(imgarray)
 # 展示
 cv2.imwrite(save_path, output_img)
+
+# plt.subplot(1, 2, 1), plt.imshow(imgarray, cmap='gray')
+# plt.title('原始图像1'), plt.xticks([]), plt.yticks([])
+# # 展示处理后图像
+# plt.subplot(1, 2, 2), plt.imshow(output_img, cmap='gray')
+# plt.title('处理图像1'), plt.xticks([]), plt.yticks([])
+# plt.show()
