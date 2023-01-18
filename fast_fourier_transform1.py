@@ -1,3 +1,5 @@
+import cv2
+import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
 
@@ -42,7 +44,7 @@ def fourier_2d(matrix):
     """Compute the discrete Fourier Transform of the matrix"""
     '''计算离散傅里叶变换'''
     M, N = matrix.shape
-    output_matrix = np.zeros((M, N), dtype=np.complex)
+    output_matrix = np.zeros((M, N), dtype=complex)
     for row in range(M):
         #对每行进行一维傅里叶变换
         output_matrix[row, :] = fourier_1d(matrix[row])
@@ -53,7 +55,7 @@ def fourier_2d(matrix):
 def inverse_fourier_2d(matrix):
     """Compute the inverse discrete Fourier Transform of the matrix"""
     M, N = matrix.shape
-    output_matrix = np.zeros((M, N), dtype=np.complex)
+    output_matrix = np.zeros((M, N), dtype=complex)
     for row in range(M):
         output_matrix[row, :] = inverse_fourier_1d(matrix[row])
     for col in range(N):
@@ -89,7 +91,7 @@ def inverse_fourier_1d(arr):
 def fast_fourier_2d(matrix):
     """Compute the discrete Fourier Transform of the matrix"""
     M, N = matrix.shape
-    output_matrix = np.zeros((M, N), dtype=np.complex)
+    output_matrix = np.zeros((M, N), dtype=complex)
     for row in range(M):
         output_matrix[row, :] = fast_fourier_1d(matrix[row])
     for col in range(N):
@@ -99,7 +101,7 @@ def fast_fourier_2d(matrix):
 def inverse_fast_fourier_2d(matrix):
     """Compute the inverse discrete Fourier Transform of the matrix"""
     M, N = matrix.shape
-    output_matrix = np.zeros((M, N), dtype=np.complex)
+    output_matrix = np.zeros((M, N), dtype=complex)
     for row in range(M):
         output_matrix[row, :] = inverse_fast_fourier_1d(matrix[row])
     for col in range(N):
@@ -108,7 +110,7 @@ def inverse_fast_fourier_2d(matrix):
 
 def fast_fourier_1d(arr):
     """Compute the discrete Fourier Transform of the 1D array"""
-    arr = np.asarray(arr, dtype=np.complex)
+    arr = np.asarray(arr, dtype=complex)
     N = arr.shape[0]
     if N % 2 > 0:
         return fourier_1d(arr)
@@ -122,7 +124,7 @@ def fast_fourier_1d(arr):
 def inverse_fast_fourier_1d(arr):
     """Compute the inverse discrete Fourier Transform of the 1D array"""
     def rec(arr):
-        arr = np.asarray(arr, dtype=np.complex)
+        arr = np.asarray(arr, dtype=complex)
         N = arr.shape[0]
         if N % 2 > 0:
             return inverse_fourier_1d(arr) * N
@@ -133,3 +135,20 @@ def inverse_fast_fourier_1d(arr):
             return np.concatenate([even_part + factor[: N // 2] * odd_part,
                                 even_part + factor[N // 2 :] * odd_part])
     return rec(arr) / arr.shape[0]
+
+
+imgpath = './src/DFT.BMP'
+img = cv2.imread(imgpath, cv2.IMREAD_GRAYSCALE)
+
+f = np.fft.fft2(img)
+fshift = np.fft.fftshift(f)
+# 这里构建振幅图的公式没学过
+magnitude_spectrum = 20*np.log(np.abs(fshift))
+
+ift = np.fft.ifftshift(magnitude_spectrum)
+iftshift = np.fft.ifft2(ift)
+magnitude_spectrum1 = 20*np.log(np.abs(iftshift))
+
+plt.subplot(1, 2, 1), plt.imshow(magnitude_spectrum1, cmap='gray')
+plt.title('原始图像1'), plt.xticks([]), plt.yticks([])
+plt.show()

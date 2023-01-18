@@ -10,18 +10,23 @@ import numpy as np
 
 def fourier_transform(imgarray, type):
     '''获得所给图片的傅里叶频谱'''
-    imgarray = dft2d(imgarray, type)
+    imgarray = dft(imgarray, type)
     #得到傅里叶谱，但此时低频成分在四角而非中间，用fftshift进行移动
     imgarray = np.fft.fftshift(imgarray)
-    imgarray = np.log(1 + np.abs(imgarray))
+    #参考opencv中文手册p147代码中的振幅图构造公式，abs取模
+    imgarray = 20*np.log(np.abs(imgarray))
     imgarray = quantize(imgarray)
     return imgarray
-def dft2d(imgarray, type):
+def dft(imgarray, type):
     '用以选择类型,调用正变换或者逆变换'
     if type == 'DFT':
         return dft_2d(imgarray)
     elif type == 'IDFT':
         return idft_2d(imgarray)
+    elif type == 'FFT':
+        return fft_2d(imgarray)
+    elif type == 'IFFT':
+        return ifft_2d(imgarray)
 def quantize(array):
     '''归一化，调整频谱图的对比度'''
     H, W = array.shape
@@ -78,3 +83,62 @@ def idft_2d(imgarray):
         garray[:, col] = idft_1d(garray[:, col])
     return garray
 
+def fft_1d(imgarray):
+    imgarray = np.asarray(imgarray, dtype=complex)
+    N = imgarray.shape[0]
+    #不符合条件的直接使用dft
+    if N % 2 > 0:
+        return dft_1d(imgarray)
+    #符合偶数个条件的使用快速傅里叶变换
+    else:
+        #从第一个开始，步长2，即奇数部分
+        even_part = fft_1d(imgarray[::2])
+        #从第二个开始，步长2，即偶数部分
+        odd_part = fft_1d(imgarray[1::2])
+        E = np.exp(-1j * 2 * np.pi * np.arange(N) / N)
+        return np.concatenate([even_part + E[: N // 2] * odd_part,
+                            even_part + E[N // 2 :] * odd_part])
+
+def ifft_1d(imgarray):
+    def rec(imgarray):
+        imgarray = np.asarray(imgarray, dtype=complex)
+        N = imgarray.shape[0]
+        if N % 2 > 0:
+            return idft_1d(imgarray) * N
+        else:
+            even_part = rec(imgarray[::2])
+            odd_part = rec(imgarray[1::2])
+            factor = np.exp(1j * 2 * np.pi * np.arange(N) / N)
+            return np.concatenate([even_part + factor[: N // 2] * odd_part,
+                                even_part + factor[N // 2 :] * odd_part])
+    return rec(imgarray) / imgarray.shape[0]
+
+def fft_2d(matrix):
+    M, N = matrix.shape
+    output_matrix = np.zeros((M, N), dtype=complex)
+    for row in range(M):
+        output_matrix[row, :] = fft_1d(matrix[row])
+    for col in range(N):
+        output_matrix[:, col] = fft_1d(output_matrix[:, col])
+    return output_matrix
+
+def ifft_2d(matrix):
+    """Compute the inverse discrete Fourier Transform of the matrix"""
+    M, N = matrix.shape
+    output_matrix = np.zeros((M, N), dtype=complex)
+    for row in range(M):
+        output_matrix[row, :] = ifft_1d(matrix[row])
+    for col in range(N):
+        output_matrix[:, col] = ifft_1d(output_matrix[:, col])
+    return output_matrix
+
+import matplotlib.pyplot as plt
+
+img = cv2.imread('src/rect.tif',0)
+magnitude_spectrum = fourier_transform(img,'FFT')
+
+plt.subplot(121),plt.imshow(img, cmap = 'gray')
+plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+plt.subplot(122),plt.imshow(magnitude_spectrum, cmap = 'gray')
+plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+plt.show()

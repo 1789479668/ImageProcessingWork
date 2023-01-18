@@ -16,12 +16,17 @@ def ImageProcessing(imgarray, type):
         return fast_fourier_transform.fourier_transform(imgarray,'DFT')
     if type == 'IDFT':
         return fast_fourier_transform.fourier_transform(imgarray,'IDFT')
+    if type == 'FFT':
+        return fast_fourier_transform.fourier_transform(imgarray,'FFT')
+    if type == 'IFFT':
+        return fast_fourier_transform.fourier_transform(imgarray,'IFFT')
     if type == 'HE':
         return equalize.equalize_hist(imgarray)
     if type == 'Roberts':
         return roberts.Roberts(imgarray)
     if type == 'GHT':
         return gray_hist_thresh.threshTwoPeaks(imgarray)
+
 '''
 0.中值滤波：MedianFilter
 1.离散傅里叶变换：DFT
@@ -29,23 +34,29 @@ def ImageProcessing(imgarray, type):
 3.灰度直方图均衡: HE
 4.Roberts算子边缘检测:Roberts
 5.灰度直方图双峰法阈值分割:GHT
+快速傅里叶变换：FFT
+快速傅里叶逆变换：IFFT
 '''
 #以下部分是通过matplotlib直接展示处理前和处理后图片，以此展示处理效果,同时在src_save文件夹储存运行后的图片
 type = ['MedianFilter',
         'DFT',
         'IDFT',
+        'FFT',
+        'IFFT',
         'HE',
         'Roberts',
         'GHT']
-#展示效果的默认图片路径，IDFT还未改善
+#展示效果的默认图片路径，IDFT还未改善，不知道为什么rect反而运行时间很久，是否保留待定
 img_path = ['./src/salt_pepper_Miss.bmp',
+            './src/rect.tif',
+            './src/FFT.BMP',
             './src/TESTPAT1.TIF',
-            './src/TESTPAT2.TIF',
+            './src/DFT.BMP',
             './src/car.jpg',
             './src/Miss.bmp',
             './src/BOARD.TIF']
 
-for i in range(6):
+for i in range(8):
     imgarray = cv2.imread(img_path[i], cv2.IMREAD_GRAYSCALE)
     new_array = ImageProcessing(imgarray, type[i])
     save_path = f'./src_save/{type[i]}.BMP'
@@ -73,7 +84,7 @@ for i in range(6):
 
 
 '''单个试验部分'''
-# img_path = './src/IC.TIF'
+# img_path = './src/car.TIF'
 # save_path = './src_save/g_Miss.BMP'
 # # 保存图片部分
 # '''对图片img，进行type类型的图像处理功能'''
