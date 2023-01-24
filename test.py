@@ -1,15 +1,26 @@
-import cv2
+import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
 
-img = cv2.imread('src/rect.tif',0)
+#读取图像
+img = cv.imread('src/rect.tif', 0)
+fff = cv.imread('src/FFT.BMP', 0)
+
+#傅里叶变换
 f = np.fft.fft2(img)
 fshift = np.fft.fftshift(f)
-# 这里构建振幅图的公式没学过
-magnitude_spectrum = 20*np.log(np.abs(fshift))
+res = np.log(np.abs(fshift))
 
-plt.subplot(121),plt.imshow(img, cmap = 'gray')
-plt.title('Input Image'), plt.xticks([]), plt.yticks([])
-plt.subplot(122),plt.imshow(magnitude_spectrum, cmap = 'gray')
-plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+#傅里叶逆变换
+ishift = np.fft.ifftshift(fff)
+iimg = np.fft.ifft2(ishift)
+iimg = np.abs(iimg)
+
+#展示结果
+plt.subplot(131), plt.imshow(img, 'gray'), plt.title('Original Image')
+plt.axis('off')
+plt.subplot(132), plt.imshow(res, 'gray'), plt.title('Fourier Image')
+plt.axis('off')
+plt.subplot(133), plt.imshow(iimg, 'gray'), plt.title('Inverse Fourier Image')
+plt.axis('off')
 plt.show()

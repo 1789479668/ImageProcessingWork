@@ -1,12 +1,8 @@
-import cv2
-import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
 
 def dft2d(matrix, flags):
     """Compute the DFT/FFT or IDFT/IFFT of the matrix according to flags"""
-    '''根据给定的标识完成FFT或者IFFT过程'''
-    '''快速傅里叶变换要求是2的n次幂，而离散傅里叶变换无该要求'''
     if flags == 'DFT':
         return fourier_2d(matrix)
     elif flags == 'IDFT':
@@ -20,17 +16,24 @@ def dft2d(matrix, flags):
 
 def fourier_spectrum(im, flags):
     """Get the Fourier spectrum of the given image"""
-    '''获得所给图片的傅里叶频谱'''
     matrix = np.array(im)
     matrix = dft2d(matrix, flags)
     matrix = np.fft.fftshift(matrix)
-    matrix = np.log(1 + np.abs(matrix))
+    matrix = np.log(np.abs(matrix))*20
+    matrix = quantize(matrix)
+    return Image.fromarray(matrix).convert("L")
+
+def inverse_fourier_spectrum(im, flags):
+    """Get the Fourier spectrum of the given image"""
+    matrix = np.array(im)
+    matrix = np.fft.ifftshift(matrix)
+    matrix = dft2d(matrix, flags)
+    matrix = np.log(np.abs(matrix))*20
     matrix = quantize(matrix)
     return Image.fromarray(matrix).convert("L")
 
 def quantize(matrix):
     """Quantize the matrix"""
-    '''数值化'''
     M, N = matrix.shape
     factor = (matrix.max() - matrix.min()) / 256
     for row in range(M):
@@ -42,11 +45,9 @@ def quantize(matrix):
 
 def fourier_2d(matrix):
     """Compute the discrete Fourier Transform of the matrix"""
-    '''计算离散傅里叶变换'''
     M, N = matrix.shape
     output_matrix = np.zeros((M, N), dtype=complex)
     for row in range(M):
-        #对每行进行一维傅里叶变换
         output_matrix[row, :] = fourier_1d(matrix[row])
     for col in range(N):
         output_matrix[:, col] = fourier_1d(output_matrix[:, col])
@@ -64,11 +65,10 @@ def inverse_fourier_2d(matrix):
 
 def fourier_1d(arr):
     """Compute the discrete Fourier Transform of the 1D array"""
-    '''计算一维矩阵的傅里叶变换'''
     N = arr.shape[0]
-    # 创建一个1xN矩阵，[0, 1, 2, ... , N - 1]
+    # [0, 1, 2, ... , N - 1]
     x = np.arange(N).reshape((1, N))
-    # transpose of x，X的转置
+    # transpose of x
     u = x.reshape((N, 1))
     # e ^ (-j * 2 * π * u * x / N)
     E = np.exp(-1j * 2 * np.pi * np.dot(u, x) / N)
@@ -82,8 +82,7 @@ def inverse_fourier_1d(arr):
     # transpose of x
     u = x.reshape((N, 1))
     # e ^ (j * 2 * π * u * x / N)
-    E = np.exp(1j * 2 * np.pi * np.dot(u, x)
-               / N)
+    E = np.exp(1j * 2 * np.pi * np.dot(u, x) / N)
     return np.dot(E, arr) / N
 
 # ==========================================================================
@@ -137,18 +136,17 @@ def inverse_fast_fourier_1d(arr):
     return rec(arr) / arr.shape[0]
 
 
-imgpath = './src/DFT.BMP'
-img = cv2.imread(imgpath, cv2.IMREAD_GRAYSCALE)
+import cv2 as cv
+img = cv.imread('src/rect.tif', 0)
 
-f = np.fft.fft2(img)
-fshift = np.fft.fftshift(f)
-# 这里构建振幅图的公式没学过
-magnitude_spectrum = 20*np.log(np.abs(fshift))
+res = fourier_spectrum(img,'FFT')
+iimg = inverse_fourier_spectrum(res,'IFFT')
 
-ift = np.fft.ifftshift(magnitude_spectrum)
-iftshift = np.fft.ifft2(ift)
-magnitude_spectrum1 = 20*np.log(np.abs(iftshift))
-
-plt.subplot(1, 2, 1), plt.imshow(magnitude_spectrum1, cmap='gray')
-plt.title('原始图像1'), plt.xticks([]), plt.yticks([])
+import matplotlib.pyplot as plt
+plt.subplot(131), plt.imshow(img, 'gray'), plt.title('Original Image')
+plt.axis('off')
+plt.subplot(132), plt.imshow(res, 'gray'), plt.title('Fourier Image')
+plt.axis('off')
+plt.subplot(133), plt.imshow(iimg, 'gray'), plt.title('Inverse Fourier Image')
+plt.axis('off')
 plt.show()

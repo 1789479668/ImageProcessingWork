@@ -15,7 +15,6 @@ def fourier_transform(imgarray, type):
     imgarray = np.fft.fftshift(imgarray)
     #参考opencv中文手册p147代码中的振幅图构造公式，abs取模
     imgarray = 20*np.log(np.abs(imgarray))
-    imgarray = quantize(imgarray)
     return imgarray
 def dft(imgarray, type):
     '用以选择类型,调用正变换或者逆变换'
@@ -27,15 +26,7 @@ def dft(imgarray, type):
         return fft_2d(imgarray)
     elif type == 'IFFT':
         return ifft_2d(imgarray)
-def quantize(array):
-    '''归一化，调整频谱图的对比度'''
-    H, W = array.shape
-    factor = (array.max() - array.min()) / 256
-    #设置权重因子
-    for row in range(H):
-        for col in range(W):
-            array[row, col] = round(array[row, col] / factor)
-    return array
+
 def dft_1d(imgarray):
     '''计算一维傅里叶变换'''
     N = imgarray.shape[0]
@@ -131,14 +122,14 @@ def ifft_2d(matrix):
     for col in range(N):
         output_matrix[:, col] = ifft_1d(output_matrix[:, col])
     return output_matrix
-
-import matplotlib.pyplot as plt
-
-img = cv2.imread('src/rect.tif',0)
-magnitude_spectrum = fourier_transform(img,'FFT')
-
-plt.subplot(121),plt.imshow(img, cmap = 'gray')
-plt.title('Input Image'), plt.xticks([]), plt.yticks([])
-plt.subplot(122),plt.imshow(magnitude_spectrum, cmap = 'gray')
-plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
-plt.show()
+#
+# import matplotlib.pyplot as plt
+#
+# img = cv2.imread('src/rect.tif',0)
+# magnitude_spectrum = fourier_transform(img,'FFT')
+#
+# plt.subplot(121),plt.imshow(img, cmap = 'gray')
+# plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+# plt.subplot(122),plt.imshow(magnitude_spectrum, cmap = 'gray')
+# plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+# plt.show()
