@@ -10,7 +10,7 @@ def equalize_hist(imgarray):
     col = imgarray.shape[1]
     for i in range(row):
         for j in range(col):
-            #每有相应灰度值，hist[该灰度值]+1，进行统计
+            #每有相应灰度值，hist[该点灰度值]+1，进行统计
             hist[imgarray[i][j]] += 1
     #对hist作归一化，
     hist = hist / (row*col)
@@ -40,15 +40,15 @@ def equalize_hist(imgarray):
             imgarray[i][j] = trans[gray_data]
     return imgarray
 
-img = 'src/car.jpg'
-save_path = './src_save/car.jpg'
-# 图像矩阵
-
-imgarray = cv2.imread(img, cv2.IMREAD_GRAYSCALE)#打开图片,并把图片转换为np矩阵
-# 直方图均衡
-output_img = equalize_hist(imgarray)
-# 展示
-cv2.imwrite(save_path, output_img)
+# img = 'src/car.jpg'
+# save_path = './src_save/car.jpg'
+# # 图像矩阵
+#
+# imgarray = cv2.imread(img, cv2.IMREAD_GRAYSCALE)#打开图片,并把图片转换为np矩阵
+# # 直方图均衡
+# output_img = equalize_hist(imgarray)
+# # 展示
+# cv2.imwrite(save_path, output_img)
 
 # plt.subplot(1, 2, 1), plt.imshow(imgarray, cmap='gray')
 # plt.title('原始图像1'), plt.xticks([]), plt.yticks([])

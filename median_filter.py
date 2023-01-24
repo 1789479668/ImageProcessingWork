@@ -20,7 +20,14 @@ def MedianFilter(imgarray, k=3, padding = None):
                     #边缘处不进行滤波（防止无像素位置的影响，如64*64图片，即(2,2)到(63,63）
                     new_array[i,j] = imgarray[i,j]
                 else:
-                    new_array[i,j] = np.median(imgarray[i-edge:i+edge+1, j-edge:j+edge+1])
+                    #改进措施，噪点通常为极小值或者极大值，如果判定该点为噪点，那么执行滤波操作，否则不进行，以保留细节。
+                    neighbour_array = imgarray[i - edge:i + edge + 1, j - edge:j + edge + 1]
+                    max = np.max(neighbour_array)
+                    min = np.min(neighbour_array)
+                    if imgarray[i,j] == max or imgarray[i,j] == min:
+                        new_array[i, j] = np.median(imgarray[i - edge:i + edge + 1, j - edge:j + edge + 1])
+                    else:
+                        new_array[i, j] = imgarray[i, j]
                     #使用median直接进行选取领域所有像素值的中间值代替当前点的像素值。
                     #使用new_array来储存运算后结果，而不是直接覆盖imgarray，防止连续作用发生
         return new_array

@@ -16,6 +16,7 @@ def fourier_transform(imgarray, type):
     #参考opencv中文手册p147代码中的振幅图构造公式，abs取模
     imgarray = 20*np.log(np.abs(imgarray))
     return imgarray
+
 def dft(imgarray, type):
     '用以选择类型,调用正变换或者逆变换'
     if type == 'DFT':
@@ -104,24 +105,23 @@ def ifft_1d(imgarray):
                                 even_part + factor[N // 2 :] * odd_part])
     return rec(imgarray) / imgarray.shape[0]
 
-def fft_2d(matrix):
-    M, N = matrix.shape
-    output_matrix = np.zeros((M, N), dtype=complex)
+def fft_2d(imgarray):
+    M, N = imgarray.shape
+    garray = np.zeros((M, N), dtype=complex)
     for row in range(M):
-        output_matrix[row, :] = fft_1d(matrix[row])
+        garray[row, :] = fft_1d(imgarray[row])
     for col in range(N):
-        output_matrix[:, col] = fft_1d(output_matrix[:, col])
-    return output_matrix
+        garray[:, col] = fft_1d(garray[:, col])
+    return garray
 
-def ifft_2d(matrix):
-    """Compute the inverse discrete Fourier Transform of the matrix"""
-    M, N = matrix.shape
-    output_matrix = np.zeros((M, N), dtype=complex)
+def ifft_2d(imgarray):
+    M, N = imgarray.shape
+    garray = np.zeros((M, N), dtype=complex)
     for row in range(M):
-        output_matrix[row, :] = ifft_1d(matrix[row])
+        garray[row, :] = ifft_1d(imgarray[row])
     for col in range(N):
-        output_matrix[:, col] = ifft_1d(output_matrix[:, col])
-    return output_matrix
+        garray[:, col] = ifft_1d(garray[:, col])
+    return garray
 #
 # import matplotlib.pyplot as plt
 #
