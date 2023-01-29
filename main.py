@@ -35,8 +35,6 @@ def ImageProcessing(imgarray, type):
     if type == 'GLPF':
         #高斯低通滤波,默认初始频率10
         return twofliter.freq_filter(imgarray,twofliter.GLPF(imgarray,10))
-
-
 '''
 0.中值滤波：MedianFilter
 1.快速傅里叶变换：FFT
@@ -46,10 +44,11 @@ def ImageProcessing(imgarray, type):
 5.灰度直方图双峰法阈值分割:GHT
 6.巴沃斯特高通滤波:BHPF
 7.高斯低通滤波:GLPF
-快速傅里叶变换：FFT
-快速傅里叶逆变换：IFFT
+离散傅里叶变换：DFT
+离散傅里叶逆变换：IDFT
 '''
 #以下部分是通过matplotlib直接展示处理前和处理后图片，以此展示处理效果,同时在src_save文件夹储存运行后的图片
+#用以储存运行图像处理类型的列表
 type = ['MedianFilter',
         'FFT',
         'IFFT',
@@ -64,9 +63,10 @@ img_path = ['./src/salt_pepper_Miss.bmp',
             './src/TESTPAT2.TIF',
             './src/car.jpg',
             './src/Miss.bmp',
-            './src/cameraman.tif',
+            './src/blood1.BMP',
             './src/blood1.BMP',
             './src/blood1.BMP']
+#输出图片的名称列表
 title = ['中值滤波图像',
          '快速傅里叶变换图像',
          '快速傅里叶逆变换图像',
@@ -75,7 +75,7 @@ title = ['中值滤波图像',
          '双峰法阈值分割图像',
          '巴沃斯特高通滤波图像',
          '高斯低通滤波图像']
-
+#按列表顺序展示图像处理结果
 for i in range(8):
     imgarray = cv2.imread(img_path[i], cv2.IMREAD_GRAYSCALE)
     new_array = ImageProcessing(imgarray, type[i])

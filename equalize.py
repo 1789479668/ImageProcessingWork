@@ -39,20 +39,16 @@ def equalize_hist(imgarray):
         for j, gray_data in enumerate(row):
             imgarray[i][j] = trans[gray_data]
     return imgarray
-
+'''
+单独运行该模块功能，则将下面的注释消除，读取图片路径在第46行中修改，保存图片路径在47行修改，默认为src_save文件夹，HEsave文件
+可能是opencv的问题，无法反映灰度变化，因此检验该部分需保存图片后进行对比。
+'''
 # img = 'src/car.jpg'
-# save_path = './src_save/car.jpg'
+# save_path = './src_save/HEsave.bmp'
 # # 图像矩阵
 #
 # imgarray = cv2.imread(img, cv2.IMREAD_GRAYSCALE)#打开图片,并把图片转换为np矩阵
 # # 直方图均衡
 # output_img = equalize_hist(imgarray)
-# # 展示
+# # 储存，save_path为地址，默认在src_save文件夹内，HEsave文件
 # cv2.imwrite(save_path, output_img)
-
-# plt.subplot(1, 2, 1), plt.imshow(imgarray, cmap='gray')
-# plt.title('原始图像1'), plt.xticks([]), plt.yticks([])
-# # 展示处理后图像
-# plt.subplot(1, 2, 2), plt.imshow(output_img, cmap='gray')
-# plt.title('处理图像1'), plt.xticks([]), plt.yticks([])
-# plt.show()
